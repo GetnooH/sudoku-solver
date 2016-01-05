@@ -48,7 +48,6 @@
         // Sudoku terminé
         if (emptyend == 0) return sudoku;
 
-
         var hypotheses = [];
         // Hypothèse nécessaire
         if (emptyCells(sudoku) > 0) {
@@ -64,8 +63,11 @@
             });
         }
 
+        console.log('Hyptheses : ' + hypotheses.length);
+
+        var hypo = sudoku.slice();
         for (var i = 0; i < hypotheses.length; i++) {
-            var hypo = sudoku;
+            console.log('hypothese n°' + i + ':'  + hypotheses[i].li + ' - ' + hypotheses[i].ci + ' - v:' + hypotheses[i].value);
             hypo[hypotheses[i].li][hypotheses[i].ci] = hypotheses[i].value;
 
             try {
@@ -88,6 +90,7 @@
             }
         }
         if (possibles.length == 0) throw 'impossible';
+
         // Colonnes
         for (var i = 0; i < 9; i++) {
             var index = possibles.indexOf(parseInt(lines[i][ci]));
@@ -96,6 +99,7 @@
             }
         }
         if (possibles.length == 0) throw 'impossible';
+
         // Carrés
         for (var i = Math.floor(li / 3) * 3; i < Math.floor(li / 3) + 3; i++) {
             for (var j = Math.floor(ci / 3) * 3; j < Math.floor(ci / 3) + 3; j++) {
@@ -107,6 +111,7 @@
         }
 
         if (possibles.length == 0) throw 'impossible';
+
         return possibles;
     }
 
@@ -129,7 +134,7 @@
 
     function emptyCells(lines) {
         var count = 0;
-        lines.forEach(function (line, li) {
+        lines.forEach(function (line) {
             count = count + line.filter(function (item) {
                     return item == ' '
                 }).length;
