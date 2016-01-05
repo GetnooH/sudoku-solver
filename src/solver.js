@@ -20,15 +20,24 @@
 
         lines = solveSudoku(lines);
 
-        lines.forEach(function (line, li) {
-            lines[li] = line.join('');
-        });
+        log(lines);
 
-        console.log(lines);
         console.log("End...");
     });
 
-    function solveSudoku(sudoku) {
+    function log(data){
+        var sudoku = data.slice();
+        sudoku.forEach(function (line, li) {
+            sudoku[li] = line.join('');
+        });
+        console.log(sudoku);
+    }
+
+
+    function solveSudoku(data) {
+        var sudoku = data.slice();
+        log(sudoku);
+
         do {
             var emptystart = emptyCells(sudoku);
             sudoku = iterate(sudoku);
@@ -58,6 +67,7 @@
         for (var i = 0; i < hypotheses.length; i++) {
             var hypo = sudoku;
             hypo[hypotheses[i].li][hypotheses[i].ci] = hypotheses[i].value;
+
             try {
                 return solveSudoku(hypo);
             } catch (e) {
@@ -77,7 +87,7 @@
                 possibles.splice(index, 1);
             }
         }
-
+        if (possibles.length == 0) throw 'impossible';
         // Colonnes
         for (var i = 0; i < 9; i++) {
             var index = possibles.indexOf(parseInt(lines[i][ci]));
@@ -85,7 +95,7 @@
                 possibles.splice(index, 1);
             }
         }
-
+        if (possibles.length == 0) throw 'impossible';
         // Carrés
         for (var i = Math.floor(li / 3) * 3; i < Math.floor(li / 3) + 3; i++) {
             for (var j = Math.floor(ci / 3) * 3; j < Math.floor(ci / 3) + 3; j++) {
@@ -97,12 +107,12 @@
         }
 
         if (possibles.length == 0) throw 'impossible';
-
         return possibles;
-
     }
 
-    function iterate(lines) {
+    function iterate(data) {
+        var lines = data.slice();
+
         lines.forEach(function (line, li) {
             line.forEach(function (cell, ci) {
                 if (cell == ' ') {
