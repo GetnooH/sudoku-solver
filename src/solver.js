@@ -66,10 +66,9 @@
             }
         } catch (e) {
             console.log('Cellule vide trouvée, Niveau ' + level + ', Hypotheses : ' + hypotheses.length);
-
             for (var i = 0; i < hypotheses.length; i++) {
-                var hypo = sudoku.slice();
-                console.log('Niveau ' + level + ', hypothese n°' + (i + 1) + ' :[L' + (hypotheses[i].li+1) + '][C' + (hypotheses[i].ci+1) + ']=' + hypotheses[i].value);
+                var hypo = JSON.parse(JSON.stringify(sudoku));
+                console.log('Niveau ' + level + ', hypothese n°' + (i + 1) + '/' + hypotheses.length + ' :[L' + (hypotheses[i].li+1) + '][C' + (hypotheses[i].ci+1) + ']=' + hypotheses[i].value);
                 hypo[hypotheses[i].li][hypotheses[i].ci] = hypotheses[i].value;
 
                 try {
