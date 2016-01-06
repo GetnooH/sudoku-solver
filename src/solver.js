@@ -7,34 +7,34 @@
 
     console.log("Start...");
 
-    var file = fs.readFile('./input/sudoku-sample-hardest', 'UTF-8', function (err, data) {
+    var file = fs.readFile('./input/sudoku-sample-hardest', 'UTF-8', function (err, input) {
         if (err) throw err;
 
 
-        var lines = data.split(os.EOL);
+        var lines = input.split(os.EOL);
         console.log(lines);
 
         lines.forEach(function (line, li) {
             lines[li] = line.split('');
         });
 
-        lines = solveSudoku(lines);
+        lines = solveSudoku(lines, 1);
 
+        console.log(os.EOL + os.EOL + "*****Réponse*****");
         log(lines);
-
-        console.log("End...");
     });
 
-    function log(data){
+    function log(data) {
+        console.log("_________________");
         var sudoku = data.slice();
         sudoku.forEach(function (line, li) {
-            sudoku[li] = line.join('');
+            sudoku[li] = line.join('|');
         });
-        console.log(sudoku);
+        console.log(sudoku.join(os.EOL) );
     }
 
 
-    function solveSudoku(data) {
+    function solveSudoku(data, level) {
         var sudoku = data.slice();
         log(sudoku);
 
@@ -49,34 +49,37 @@
         if (emptyend == 0) return sudoku;
 
         var hypotheses = [];
-        // Hypothèse nécessaire
-        if (emptyCells(sudoku) > 0) {
-            sudoku.forEach(function (line, li) {
-                line.forEach(function (cell, ci) {
-                    if (cell == ' ') {
-                        var possibles = getThePossibles(sudoku, ci, li);
-                        for (var i = 0; i < possibles.length; i++) {
-                            hypotheses.push({li: li, ci: ci, value: possibles[i]});
+        // Hypothèse nécessaire sur la première cellule vide trouvée
+        try {
+            if (emptyCells(sudoku) > 0) {
+                sudoku.forEach(function (line, li) {
+                    line.forEach(function (cell, ci) {
+                        if (cell == ' ') {
+                            var possibles = getThePossibles(sudoku, ci, li);
+                            for (var i = 0; i < possibles.length; i++) {
+                                hypotheses.push({li: li, ci: ci, value: possibles[i]});
+                            }
+                            throw 'found';
                         }
-                    }
+                    });
                 });
-            });
-        }
+            }
+        } catch (e) {
+            console.log('Cellule vide trouvée, Niveau ' + level + ', Hypotheses : ' + hypotheses.length);
+            for (var i = 0; i < hypotheses.length; i++) {
+                var hypo = JSON.parse(JSON.stringify(sudoku));
+                console.log('Niveau ' + level + ', hypothese n°' + (i + 1) + '/' + hypotheses.length + ' :[L' + (hypotheses[i].li+1) + '][C' + (hypotheses[i].ci+1) + ']=' + hypotheses[i].value);
+                hypo[hypotheses[i].li][hypotheses[i].ci] = hypotheses[i].value;
 
-        console.log('Hyptheses : ' + hypotheses.length);
-
-        var hypo = sudoku.slice();
-        for (var i = 0; i < hypotheses.length; i++) {
-            console.log('hypothese n°' + i + ':'  + hypotheses[i].li + ' - ' + hypotheses[i].ci + ' - v:' + hypotheses[i].value);
-            hypo[hypotheses[i].li][hypotheses[i].ci] = hypotheses[i].value;
-
-            try {
-                return solveSudoku(hypo);
-            } catch (e) {
-                console.log(e);
+                try {
+                    return solveSudoku(hypo, level + 1);
+                } catch (e) {
+                    console.log(e);
+                }
             }
         }
 
+        throw 'branche impossible';
     }
 
     function getThePossibles(lines, ci, li) {
@@ -101,8 +104,8 @@
         if (possibles.length == 0) throw 'impossible';
 
         // Carrés
-        for (var i = Math.floor(li / 3) * 3; i < Math.floor(li / 3) + 3; i++) {
-            for (var j = Math.floor(ci / 3) * 3; j < Math.floor(ci / 3) + 3; j++) {
+        for (var i = Math.floor(li / 3) * 3; i < (Math.floor(li / 3) * 3) + 3; i++) {
+            for (var j = Math.floor(ci / 3) * 3; j < (Math.floor(ci / 3) * 3) + 3; j++) {
                 var index = possibles.indexOf(parseInt(lines[i][j]));
                 if (index > -1) {
                     possibles.splice(index, 1);
